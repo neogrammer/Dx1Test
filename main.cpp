@@ -227,7 +227,8 @@ HWND CreateWindow(const wchar_t* windowClassName, HINSTANCE hInst,
     const wchar_t* windowTitle, uint32_t width, uint32_t height)
 
 {
-
+	width = 1366Ui32;
+	height = 768Ui32;
 
     int screenWidth = ::GetSystemMetrics(SM_CXSCREEN);
 
@@ -284,9 +285,9 @@ ComPtr<IDXGIAdapter4> GetAdapter(bool useWarp)
 {
     ComPtr<IDXGIFactory4> dxgiFactory;
     UINT createFactoryFlags = 0;
-//#if defined(_DEBUG)
-//    createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
-//#endif
+#if defined(_DEBUG)
+    createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
+#endif
 
     ThrowIfFailed(CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory)));
 
@@ -523,9 +524,9 @@ ComPtr<IDXGISwapChain4> CreateSwapChain(HWND hWnd,
     ComPtr<IDXGISwapChain4> dxgiSwapChain4;
     ComPtr<IDXGIFactory4> dxgiFactory4;
     UINT createFactoryFlags = 0;
-//#if defined(_DEBUG)
-    //createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
-//#endif
+#if defined(_DEBUG)
+    createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
+#endif
 
     ThrowIfFailed(CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory4)));
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
@@ -736,7 +737,12 @@ void Update()
         char buffer[500];
         auto fps = frameCounter / elapsedSeconds;
         sprintf_s(buffer, 500, "FPS: %f\n", fps);
-        OutputDebugString((wchar_t*)buffer);
+		size_t size = strlen(buffer) + 1;
+		wchar_t*  wc = new wchar_t[size];
+
+		size_t outSize;
+		mbstowcs_s(&outSize, wc, size, buffer, size - 1);
+       OutputDebugString(wc);
 
         frameCounter = 0;
         elapsedSeconds = 0.0;
@@ -1021,7 +1027,7 @@ void SetFullscreen(bool fullscreen)
                 SWP_FRAMECHANGED | SWP_NOACTIVATE);
 
 
-
+			
 
             ::ShowWindow(g_hWnd, SW_NORMAL);
 
@@ -1245,7 +1251,7 @@ int CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdL
 
     ParseCommandLineArguments();
 
-    //EnableDebugLayer();
+    EnableDebugLayer();
   /*  IDXGIDebug* debug = { 0 };
     DXGIGetDebugInterface(IID_IDXGIDebug, (void**)(&debug));*/
    
@@ -1258,10 +1264,7 @@ int CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdL
     RegisterWindowClass(hInstance, windowClassName);
 
 
-    g_hWnd = CreateWindow(windowClassName, hInstance, L"Learning DirectX 12",
-
-
-        g_ClientWidth, g_ClientHeight);
+    g_hWnd = CreateWindow(windowClassName, hInstance, L"Learning DirectX 12",  g_ClientWidth, g_ClientHeight);
 
 
 
@@ -1285,10 +1288,7 @@ int CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdL
 
 
 
-    g_SwapChain = CreateSwapChain(g_hWnd, g_CommandQueue,
-
-
-        g_ClientWidth, g_ClientHeight, g_NumFrames);
+    g_SwapChain = CreateSwapChain(g_hWnd, g_CommandQueue,     g_ClientWidth, g_ClientHeight, g_NumFrames);
 
 
 
@@ -1333,7 +1333,7 @@ int CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdL
 
     g_IsInitialized = true;
 
-
+	
 
 
     ::ShowWindow(g_hWnd, SW_SHOW);
